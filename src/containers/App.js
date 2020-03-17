@@ -4,41 +4,71 @@ import Nav from '../components/Nav';
 import Scroll from '../components/Scroll'
 import CardList from '../components/CardList';
 import Searchbox from '../components/Searchbox';
-import { pets } from './pets';
 
 class App extends React.Component {
 	constructor() {
 		super()
 		this.state = {
 			'pets': [],
-			'searchField': ''
+			'images': [],
+			'searchField': '',
+			'isPetSelected': false,
+			'selectedPetPk': '',
+			'likes': [],
+			'loggedUser': 1
 		}
 	}
 
 	componentDidMount() {
-		this.setState({ pets: pets});
+		fetch('http://localhost:4412/api/pets')
+		.then(response => response.json())
+		.then(response => this.setState({pets: response}));
+
+		fetch('http://localhost:4412/api/images')
+		.then(response => response.json())
+		.then(response => this.setState({images: response}));
+
+		fetch('http://localhost:4412/api/likes/')
+		.then(response => response.json())
+		.then(response => this.setState({likes: response}));
 	}
 
 	onSearchChange = (event) => {
 		this.setState({ searchField: event.target.value });
 	}
 
+	onPetSelection = (pk) => {
+		this.setState({isPetSelected: !this.state.isPetSelected, selectedPetPk: pk, searchField: ''});
+	}
+
 	render() {
-		const { pets, searchField } = this.state;
+		const { pets, searchField, images, isPetSelected, selectedPetPk, likes, loggedUser } = this.state;
 		const filteredPets = pets.filter(pet => {
-			return pet.name.toLowerCase().includes(searchField.toLowerCase());
+			return pet.name.toLowerCase().includes(searchField.toLowerCase()) ||
+						pet.type.toLowerCase().includes(searchField.toLowerCase()) ||
+						pet.description.toLowerCase().includes(searchField.toLowerCase()) ||
+						pet.gender.toLowerCase().match(searchField.toLowerCase());
 		})
 		return !pets.length ?
 			<h1 className="tc">Loading</h1> :
 			(
 				<div className="tc">
 					<Nav />
-					<Searchbox searchChange={this.onSearchChange}/>
-					<Scroll>
-						<ErrorBoundary>
-							<CardList pets={filteredPets} />
-						</ErrorBoundary>
-					</Scroll>
+					{!isPetSelected ?
+						<div>
+							<Searchbox searchChange={this.onSearchChange}/>
+							<Scroll>
+								<ErrorBoundary>
+									<CardList loggedUser={loggedUser} images={images} pets={filteredPets} onPetSelection={this.onPetSelection} isPetSelected={isPetSelected} selectedPetPk={selectedPetPk} likes={likes}/>
+								</ErrorBoundary>
+							</Scroll>
+						</div> :
+						<Scroll>
+							<ErrorBoundary>
+								<CardList loggedUser={loggedUser} searchChange={this.onSearchChange} images={images} pets={filteredPets} onPetSelection={this.onPetSelection} isPetSelected={isPetSelected} selectedPetPk={selectedPetPk} likes={likes}/>
+							</ErrorBoundary>
+						</Scroll>
+					}
 				</div>
 			);
 	}
