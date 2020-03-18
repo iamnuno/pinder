@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import {Link } from 'react-router-dom';
-
 import '../css/Sign_Up_Style.css';
+
+import { setUserSession } from './Common';
+
 
 class SignIn extends Component {
 
@@ -36,8 +38,7 @@ class SignIn extends Component {
     .then(res => res.json())
     .then(data =>{
       this.setState({res: data});
-      this.props.isLogedIn(this.state.res.status, this.state.res.id);
-      console.log(this.state.res.id);
+      setUserSession(data.Token, data.Data);
       this.handleMessage(event);
     })
     .catch(error => console.error('Error:', error))
@@ -62,6 +63,7 @@ class SignIn extends Component {
 
     render() {
         return (
+         
           <div  className="sign">
             <div className="wrap">
                 <h2>Log In</h2>

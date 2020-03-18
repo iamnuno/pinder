@@ -3,17 +3,21 @@ import 'tachyons';
 import logo from '../assets/logo.jpg';
 import { Link } from 'react-router-dom';
 
+import { getToken } from './Common';
+
 class Header extends Component {
 
   componentDidMount() {
+
   }
 
-  signOut = () => {
-  }
+ 
+
+ 
 
   render() {
 
-    let profile = (this.props.status) ? <Link to="/profile" className="link dim white f6 f5-l dib mr3 mr4-l" title="Profile">Profile</Link> : null;
+    let profile = (getToken()) ? <Link to="/profile" className="link dim white f6 f5-l dib mr3 mr4-l" title="Profile">Profile</Link> : null;
 
     return (
       <nav className="db dt-l w-100 border-box pa3 ph5-l" style={{ "backgroundImage": 'linear-gradient(rgba(175,171,171,0.7), rgba(96,98,106, 0.3) )' }}>
@@ -25,7 +29,7 @@ class Header extends Component {
           {profile}
           <Link to="/about" className="link dim white f6 f5-l dib mr3 mr4-l" title="About">About</Link>
           <Link to="/contact-us" className="link dim white f6 f5-l dib mr3 mr4-l" title="Contact Us">Contact Us</Link>
-          <Link to="/sign_in" className="link dim white f6 f5-l dib mr3 mr4-l" title="Log" >{(this.props.status) ? "Sign out" : "Sign in"}</Link>
+          <Link to={(getToken())? '/sign_out': '/sign_in'} className="link dim white f6 f5-l dib mr3 mr4-l" title="Log" >{(getToken()) ? "Sign out" : "Sign in"}</Link>
         </div>
       </nav>
     );

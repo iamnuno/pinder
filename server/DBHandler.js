@@ -1,6 +1,8 @@
 var connection = require('./database');
 var moment = require('moment');
 
+var jwt = require('jsonwebtoken');
+
 const getUsers = async () => {
   return new Promise((resolve, reject) => {
     connection.query('SELECT * FROM users', (err, results) => {
@@ -190,7 +192,35 @@ const getImage = async (petID) => {
   });
 }
 
+function generateToken(user){
 
+  if(!user) return null;
+
+  var u ={
+      userID: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      birthday: user.birthday
+  };
+
+  return token = jwt.sign(u, process.env.JWT_SECRET, {
+      expiresIn: 60 * 60 * 24
+  });
+}
+
+const getUserByEmail = async(email)=>{
+  return new Promise((resolve, reject)=>{
+      connection.query('SELECT id, firstName, lastName, email, birthday FROM users WHERE email=?',
+  [email], (err, results) =>{
+      if(err){
+          return reject(err);
+      }
+      resolve(results);
+  });
+  });
+  
+}
 
 module.exports = {
   getUsers: getUsers,
@@ -199,6 +229,8 @@ module.exports = {
   updateUser: updateUser,
   updatePet: updatePet,
   getUser: getUser,
+  getUserByEmail: getUserByEmail,
+  generateToken: generateToken,
   getAllPets: getAllPets,
   getPets: getPets,
   addPet: addPet,

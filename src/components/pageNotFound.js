@@ -1,7 +1,7 @@
+
 import React, {Component} from 'react';
 
-export default class About extends Component {
-
+export default class PageNotFound extends Component {
   constructor(props){
     super(props);
     this.state = {
@@ -10,7 +10,7 @@ export default class About extends Component {
   }
 
   async componentDidMount() {
-   await fetch('http://localhost:4412/about', {method: 'GET',
+   await fetch('http://localhost:4412/**', {method: 'GET',
     headers: {'Content-Type': 'text/html' }})
     .then(res => {
       return res.text();
@@ -27,6 +27,7 @@ export default class About extends Component {
   }
 
   render(){
+
     return (
       <div>
       <div dangerouslySetInnerHTML= {this.state} />

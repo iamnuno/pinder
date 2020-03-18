@@ -20,6 +20,7 @@ class Home extends React.Component {
 	}
 
 	componentDidMount() {
+		
 		console.log(this.state.loggedUser);
 		fetch('http://localhost:4412/api/pets')
 		.then(response => response.json())

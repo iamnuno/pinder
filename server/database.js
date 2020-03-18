@@ -4,7 +4,7 @@ var mysql = require('mysql');
     host: 'localhost',
     port: 3306,
     user: 'root',
-    database: 'test1'
+    database: 'pinder'
 });
 
 module.exports = connection;

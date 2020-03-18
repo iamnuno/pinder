@@ -5,6 +5,8 @@ import '../css/Sign_Up_Style.css';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
+import { setUserSession } from './Common';
+
 class SignUp extends Component {
 
   constructor(props) {
@@ -53,8 +55,8 @@ class SignUp extends Component {
       .then(res => res.json())
 
       .then(data => {
-
         this.setState({ res: data });
+        setUserSession(data.Token, data.Data);
         console.log("Message %s ", this.state.res.message);
         this.handleMessage(event);
       })
@@ -69,10 +71,9 @@ class SignUp extends Component {
   handleMessage(event) {
     if (this.state.res.status) {
       this.setState({ style: "green center tc" });
-      this.props.isLogedIn(this.state.res.status);
       setTimeout(() => {
         this.props.history.push('/home/');
-      }, 3000);
+      }, 1000);
     }
     else {
       this.setState({ style: "red center tc" });
