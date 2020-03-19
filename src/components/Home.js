@@ -54,7 +54,7 @@ class Home extends React.Component {
 		return !pets.length ?
 			<h1 className="tc">Loading</h1> :
 			(
-				<div className="tc" style={{paddingTop:"30px"}}>
+				<div className="tc" style={{paddingTop:"20px"}}>
 					{!isPetSelected ?
 						<div>
 							<Searchbox  searchChange={this.onSearchChange}/>

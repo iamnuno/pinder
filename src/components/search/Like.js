@@ -32,6 +32,7 @@ function Like({ likes, selectedPetPk, loggedUser }) {
 
 	function handleClick() {
 		makeLike(loggedUser, selectedPetPk, comment);
+		window.location.reload();
 	}
 
 	if (!likedThisPet.length) {
