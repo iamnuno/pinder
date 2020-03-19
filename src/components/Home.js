@@ -4,6 +4,7 @@ import Nav from '../components/search/Nav';
 import Scroll from '../components/search/Scroll'
 import CardList from '../components/search/CardList';
 import Searchbox from '../components/search/Searchbox';
+import { getUser } from './Common';
 
 class Home extends React.Component {
 	constructor(props) {
@@ -15,13 +16,12 @@ class Home extends React.Component {
 			'isPetSelected': false,
 			'selectedPetPk': '',
 			'likes': [],
-			'loggedUser': this.props.id
+			'loggedUser': getUser()
 		}
 	}
 
 	componentDidMount() {
-		
-		console.log(this.state.loggedUser);
+
 		fetch('http://localhost:4412/api/pets')
 		.then(response => response.json())
 		.then(response => this.setState({pets: response}));

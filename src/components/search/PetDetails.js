@@ -61,7 +61,7 @@ function PetDetails({ isPetSelected, onPetSelection, selectedPetPk, images, pets
 			<p className='pointer tl pa3' onClick={onPetSelection}>{'<- Back to search'}</p>
 			<article className="w-75 bg-washed-green dib br3 ma2 pa4-ns mv3 ba b--black-10 shadow-3 bg-animate hover-bg-light-green">
 		  <div className="tl pa3">
-		  	<div className="tr pa1"><Like selectedPetPk={selectedPetPk} likes={likes} loggedUser={loggedUser}/></div>
+		  	<div className="tr pa1"><Like selectedPetPk={selectedPetPk} likes={likes} loggedUser={loggedUser} /></div>
 		  	<div className="tc">{imgs}</div>
 		    <p className="f4 mb2 dark-grey"><strong>Name: </strong>{pet.name}</p>
 		    <p className="f4 mb2 dark-grey"><strong>Type: </strong>{type}</p>

@@ -3,9 +3,7 @@ import Popup from "reactjs-popup";
 import empty from '../../assets/icons/heart_empty.png';
 import  full from '../../assets/icons/heart_full.png';
 
-
 function makeLike(loggedUser, selectedPetPk, comment) {
-	console.log(loggedUser, selectedPetPk);
 
 	fetch('http://localhost:4412/api/likes/', {
 	  method: 'POST',
@@ -21,12 +19,14 @@ function makeLike(loggedUser, selectedPetPk, comment) {
 	})
 }
 
-function Like({ likes, loggedUser, selectedPetPk }) {
+function Like({ likes, selectedPetPk, loggedUser }) {
+
+	console.log(typeof loggedUser);
 
 	const thisPetLikes = likes.filter((like) => like.pets_id === selectedPetPk);
-	const likedThisPet = thisPetLikes.filter((like) => like.users_id === loggedUser);
+	const likedThisPet = thisPetLikes.filter((like) => like.users_id == loggedUser);
 
-	console.log(likedThisPet);
+	//console.log(thisPetLikes);
 
 	const [comment, setComment] = React.useState('');
 
