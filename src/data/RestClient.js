@@ -4,34 +4,14 @@ async function getAccount(id) {
   return response.json()
 }
 
-async function uploadImg(file, uid, id) {
-  const formData = new FormData();
-
-  for (const name in file) {
-    formData.append("image", file[name]);
-  }
-
-const uploadImg = await fetch(`http://localhost:4412/api/upload/${uid}/${id}`, {
-  method: 'POST',
-  body: formData,
-  headers: { 'Content-Type': 'multipart/form-data' }
-})
-  .then(res => console.log(res.json()))
-  .catch(error => console.error('Error:', error))
-  .then(response => console.log('Success:', response));
-
-}
-
-
-function newPet(data, file) {
+function newPet(data) {
   fetch('http://localhost:4412/api/newpet', {
     method: 'POST',
-    body: data,
+    body: JSON.stringify(data),
     headers: { 'Content-Type': 'application/json' }
   })
-    .then(console.log(this.uploadImg(file, data.users_id, data.id)))
-    .catch(error => console.error('Error:', error))
-    .then(response => console.log('Success:', response));
+    .catch(error => alert("Failed to add new pet. Try later!"))
+    .then(response => alert("New pet added!"))
 }
 
 function update(isUser, data) {
@@ -56,6 +36,5 @@ function update(isUser, data) {
 module.exports = {
   getAccount: getAccount,
   update: update,
-  uploadImg: uploadImg,
   newPet: newPet
 }

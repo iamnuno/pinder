@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import editIcon from '../../assets/icons/edit.png';
+import addImage from '../../assets/icons/new_image.png';
 import user from '../../data/User.js';
 import NewPetContainer from './NewPetContainer.js';
 import add from '../../assets/icons/add.png';
@@ -11,6 +12,8 @@ import 'tachyons';
 import "tachyons-word-break";
 import 'swiper/css/swiper.css';
 import ReactLoading from "react-loading";
+import CommentContainer from './CommentContainer';
+import { getUser } from '../Common';
 
 class UserProfile extends Component {
 
@@ -22,22 +25,23 @@ class UserProfile extends Component {
     activeProfile: 'ahmad',
     showPetContainer: false,
     loading: true,
-    id: this.props.id
+    id: getUser(),
+    selectedFile: null
   };
 
-  componentDidMount(time=1000) {
-    // if(this.state.id)
-    setTimeout(() => {
-      client.getAccount(1)
-        .then(res =>
-          this.setState({
-            user: new user(res["0"].firstName, res["0"].lastName, "decs", res["0"].email, res["0"].birthday, res["0"].password, res["picture"], res["0"].id),
-            pets: res["pets"],
-            activeProfile: res["0"].firstName + " " + res["0"].lastName,
-            loading: false
-          })
-        )
-    }, time);
+  componentDidMount(time = 1000) {
+    if (this.state.id)
+      setTimeout(() => {
+        client.getAccount(this.state.id)
+          .then(res =>
+            this.setState({
+              user: new user(res["0"].firstName, res["0"].lastName, "decs", res["0"].email, res["0"].birthday, res["0"].password, res["picture"], res["0"].id),
+              pets: res["pets"],
+              activeProfile: res["0"].firstName + " " + res["0"].lastName,
+              loading: false
+            })
+          )
+      }, time);
   }
 
   generateTable = (labels, profile) => {
@@ -75,35 +79,35 @@ class UserProfile extends Component {
     } else {
       this.save.style.top = "10px";
       this.cancel.style.top = "10px";
-      
+
       this.setState({
         edit: false
       });
       if (save) {
-        
+
         if (this.state.activeProfile === this.state.user.name) {
-          var name = this.Name.innerHTML.split(' ',2);
+          var name = this.Name.innerHTML.split(' ', 2);
           client.update(true,
-             {
-               id:this.state.user.id,
-               firstName:name[0],
-               lastName:name[1],
-               birthday:this.Birthday.innerHTML,
-               email:this.Email.innerHTML,
-               password:this.Password.innerHTML
-             });
+            {
+              id: this.state.user.id,
+              firstName: name[0],
+              lastName: name[1],
+              birthday: this.Birthday.innerHTML,
+              email: this.Email.innerHTML,
+              password: this.Password.innerHTML
+            });
         } else {
           for (let index = 0; index < this.state.pets.length; index++) {
 
-            if (this.state.activeProfile === this.state.pets[index].name){
+            if (this.state.activeProfile === this.state.pets[index].name) {
               client.update(false,
                 {
-                  id:this.state.pets[index].id,
-                  name:this.Name.innerHTML,
-                  description:this.desc.innerHTML,
-                  birthday:this.Birthday.innerHTML,
-                  type:this.Type.innerHTML,
-                  gender:this.Gender.innerHTML
+                  id: this.state.pets[index].id,
+                  name: this.Name.innerHTML,
+                  description: this.desc.innerHTML,
+                  birthday: this.Birthday.innerHTML,
+                  type: this.Type.innerHTML,
+                  gender: this.Gender.innerHTML
                 });
             }
           }
@@ -111,6 +115,9 @@ class UserProfile extends Component {
       }
       this.componentDidMount(0);
     }
+    this.setState({
+      selectedFile: null
+    })
   }
 
   generateSideSlide = () => {
@@ -118,7 +125,7 @@ class UserProfile extends Component {
     var i = 0;
 
     if (this.state.activeProfile !== this.state.user.name)
-      items.push(<img key={this.state.user.id} onClick={() => this.changeProfile(this.state.user.name)} className=" slide-icon absolute ba bw1 shadow-1-l  br-100" style={{ top: (60 * (i++)) + "px" }} src={"http://localhost:4412/api/file/" + this.state.user.picture} alt={this.state.user.name} title={this.state.user.name} />);
+      items.push(<img key={this.state.user.id} onClick={() => this.changeProfile(this.state.user.name)} className=" slide-icon absolute ba bw1 shadow-1-l  br-100" style={{ top: (60 * (i++)) + "px" }} src={"http://localhost:4412/api/file/" + this.state.user.picture[0]} alt={this.state.user.name} title={this.state.user.name} />);
 
     for (const [index, value] of this.state.pets.entries()) {
 
@@ -129,6 +136,7 @@ class UserProfile extends Component {
         i++;
       }
     }
+
     items.push(
       <img key={"add"} onClick={() => this.changeProfile("add", true)} className="objectFit-cover slide-icon br-100  bw1 absolute shadow-1-l" style={{ top: (60 * (i)) + "px" }} src={add} alt="add new pet" title="Add new pet" />
     );
@@ -149,6 +157,13 @@ class UserProfile extends Component {
     this.setState({
       activeProfile: name
     });
+  }
+
+  NewPetContainerState = (state) => {
+    this.setState({
+      showPetContainer: state
+    })
+    this.componentDidMount(1000);
   }
 
   profileGallery = (img) => {
@@ -188,22 +203,72 @@ class UserProfile extends Component {
     );
   }
 
+  fileSelecetedHandler = event => {
+    this.setState({
+      selectedFile: event.target.files[0]
+    })
+  }
+
+  fileUploadHandler = () => {
+    if (this.state.selectedFile == null) {
+      alert("You need to select an image first!");
+      return;
+    } else {
+      console.log(this.state.selectedFile);
+      var formData = new FormData();
+      formData.append('image', this.state.selectedFile);
+      var petID = 0;
+      this.state.pets.forEach(item => {
+        if (this.state.activeProfile === item.name)
+          petID = item.id;
+      });
+      alert(petID);
+      fetch(`http://localhost:4412/api/upload/${this.state.user.id}/${petID}/1`, {
+        method: 'POST',
+        body: formData
+      })
+        .then(res => console.log(res.json()))
+        .catch(error => console.error('Error:', error))
+        .then(response => console.log('Success:', response));
+    }
+  }
+
   render() {
     let desc;
     let pic;
     var grid;
-    let PetContainer = (this.state.showPetContainer) ? <NewPetContainer /> : null;
+    let activePet;
+    let comment = null;
+    let PetContainer = (this.state.showPetContainer) ? <NewPetContainer uid={this.state.user.id} container={this.NewPetContainerState} /> : null;
+    let newImageIcon = (!this.state.edit) ? null
+      :
+      <div className="center w-20 flex">
+        <input type="file"
+          style={{ display: "none" }}
+          onChange={this.fileSelecetedHandler}
+          name="image"
+          ref={fileInput => this.fileInput = fileInput} />
+        <img className="w2 h2 edit-icon overflow-hidden br-100 objectFit-cover"
+          src={addImage} onClick={() => this.fileInput.click()} />
+        <div>
+          <button className="mv1 ml2 bg-light-blue white ba br2" onClick={this.fileUploadHandler}>Upload</button>
+        </div>
+      </div>
 
 
     if (!this.state.loading) {
 
       if (this.state.activeProfile === this.state.user.name) {
         desc = this.state.user.description;
+        comment = null;
         pic = this.profileGallery(this.state.user.picture);
         grid = this.generateTable(this.state.userLabels, this.state.user);
       } else {
         for (const [index, value] of this.state.pets.entries()) {
           if (this.state.activeProfile === value.name) {
+            activePet = value;
+            if (value.comments.length != 0)
+              comment = <CommentContainer {...this.props} pet={activePet} />;
             desc = value.description;
             pic = this.profileGallery(value.picture);
             grid = this.generateTable(this.state.petsLabels, value);
@@ -231,6 +296,7 @@ class UserProfile extends Component {
             </div>
 
             {pic}
+            {newImageIcon}
 
             <div ref={(input) => { this.desc = input }} className="center mt1-ns mv2-ns bg-white pa2 br4 word-wrap tc" style={{ maxWidth: "70%", textAlign: "center" }} contentEditable={this.state.edit} suppressContentEditableWarning={true}>{desc}</div>
             <div className="center w-80 bg-black" style={{ height: "1px" }}></div>
@@ -238,10 +304,10 @@ class UserProfile extends Component {
             {grid}
           </div>
           {PetContainer}
+          {comment}
         </div>
       );
     }
-
   }
 }
 

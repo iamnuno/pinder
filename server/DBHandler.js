@@ -51,15 +51,10 @@ function deletePet(petID, callback) {
 }
 
 // add a pet to db
-const addPet = async (json, id) => {
-  console.log(json);
+function addPet  (json,callback) {
   connection.query(
     'INSERT INTO pets SET name = ?, birthday = ?, gender = ?, description = ?, type = ?, users_id = ?',
-    [json.name, json.birthday, json.gender, json.description, json.type, json.users_id],
-    (err, results) => {
-      if (err) return reject(err);
-      resolve(results);
-    })
+    [json.name, json.birthday, json.gender, json.description, json.type, json.users_id],callback)
 }
 
 const maxId = async () => {
@@ -219,7 +214,7 @@ const getUserByEmail = async(email)=>{
       resolve(results);
   });
   });
-  
+
 }
 
 module.exports = {

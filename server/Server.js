@@ -27,14 +27,14 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 
-app.use(function (req, res, next) {
+app.use(function(req, res, next) {
   var token = req.headers['authorization'];
 
   if (!token) return next();
 
   token = token.replace('Bearer ', '');
 
-  jwt.verify(token, process.env.JWT_SECRET, function (err, user) {
+  jwt.verify(token, process.env.JWT_SECRET, function(err, user) {
     if (err) {
       return res.status(401).json({
         error: true,
@@ -47,15 +47,15 @@ app.use(function (req, res, next) {
   });
 });
 
-conn.connect(function (err) {
+conn.connect(function(err) {
   if (err) console.log(err);
   else console.log('connected');
 });
 
 //Verify the user's authentication
-app.post('/api/verifyToken', async (req, res)=> {
+app.post('/api/verifyToken', async (req, res) => {
   var token = req.body.token;
-  var userID = req.body.userId ;
+  var userID = req.body.userId;
 
   userData = await dBHandler.getUser(userID);
 
@@ -66,7 +66,7 @@ app.post('/api/verifyToken', async (req, res)=> {
     });
   }
 
-  jwt.verify(token, process.env.JWT_SECRET, function (err, user) {
+  jwt.verify(token, process.env.JWT_SECRET, function(err, user) {
     if (err) return res.status(401).json({
       error: true,
       message: "Invalid token."
@@ -79,7 +79,10 @@ app.post('/api/verifyToken', async (req, res)=> {
     //   });
     // }
 
-    return res.json({ Data: userData[0].id, Token: token });
+    return res.json({
+      Data: userData[0].id,
+      Token: token
+    });
   });
 });
 
@@ -88,7 +91,7 @@ app.post('/api/login', async (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
 
-  dBHandler.logedIn(email, password, async (err, data)=> {
+  dBHandler.logedIn(email, password, async (err, data) => {
     if (err) {
       console.log(err);
     }
@@ -96,10 +99,18 @@ app.post('/api/login', async (req, res) => {
     if (data[0].cnt > 0) {
       userData = await dBHandler.getUserByEmail(email);
       var token = dBHandler.generateToken(userData);
-      res.json({ message: "Log In Successfully", status: true, Data: userData[0].id, Token: token });
-    }
-    else {
-      res.json({ message: "Check your email and password", status: false, Data: userData[0].id });
+      res.json({
+        message: "Log In Successfully",
+        status: true,
+        Data: userData[0].id,
+        Token: token
+      });
+    } else {
+      res.json({
+        message: "Check your email and password",
+        status: false,
+        Data: userData[0].id
+      });
 
     }
 
@@ -108,18 +119,21 @@ app.post('/api/login', async (req, res) => {
 
 //To check if the user has the previliage to access home page
 app.get('/home', (req, res) => {
-  if (!req.user) return res.status(401).json({ success: false, message: 'Invalid user to access it.' });
+  if (!req.user) return res.status(401).json({
+    success: false,
+    message: 'Invalid user to access it.'
+  });
   res.send('Welcome ' + req.user.name);
 });
 
 //To send contact us page
-app.get('/contact_us', function (req, res) {
+app.get('/contact_us', function(req, res) {
 
   res.sendFile(path.resolve(__dirname, "public", "contactUs.html"));
 });
 
 //To send about page
-app.get('/about', function (req, res) {
+app.get('/about', function(req, res) {
 
   res.sendFile(path.resolve(__dirname, "public", "About.html"));
 });
@@ -140,6 +154,8 @@ app.get('/api/user/:id', async (req, res) => {
   (await dBHandler.getImages(req.params.id, 0)).forEach((item, i) => {
     userPic.push(item.url);
   });
+  if (userPic.length == 0)
+  userPic.push("user_avatar.png");
 
   json.picture = userPic;
 
@@ -147,11 +163,19 @@ app.get('/api/user/:id', async (req, res) => {
 
   for (var i = 0; i < pets.length; i++) {
     var petpic = [];
+    var comments = [];
     (await dBHandler.getImages(req.params.id, pets[i].id)).forEach((item, i) => {
       petpic.push(item.url);
     });
+    if (petpic.length == 0)
+    petpic.push("user_avatar.png");
+
+    (await dBHandler.getComments(pets[i].id)).forEach((item, i) => {
+      comments.push(item);
+    });
     pets[i]["birthday"] = moment(pets[i]["birthday"]).format('YYYY-MM-DD');
     pets[i]["picture"] = petpic;
+    pets[i]["comments"] = comments;
   }
   json["pets"] = pets;
   return res.json(json);
@@ -169,7 +193,7 @@ app.post('/api/createUser', async (req, res) => {
   const birthday = moment(birth).format('YYYY-MM-DD');
 
   if (password === confirmPassword) {
-    dBHandler.emailExists(email, async (err, data) =>{
+    dBHandler.emailExists(email, async (err, data) => {
       if (err) console.log(err);
 
       if (data[0].cnt > 0) {
@@ -251,24 +275,28 @@ app.get('/api/pets', async (req, res) => {
 
 // remove pet from database
 app.delete('/api/removepet/:id', async (req, res) => {
-  dBHandler.deletePet(req.params.id, function (err, data) {
+  dBHandler.deletePet(req.params.id, function(err, data) {
 
     if (err) {
       console.log(err);
     }
-    res.json("Item has be removed permanently!");
+    res.json("Item has been removed permanently!");
   });
 });
 
 // register a new pet for user
 app.post('/api/newpet', async (req, res) => {
-  let id = await dBHandler.maxId();
+  dBHandler.addPet(req.body, function(err, data) {
 
-  res.json(response);
+    if (err)
+      console.log(err);
+
+    res.json("New pet added!");
+  });
 });
 
 //send an image
-app.get('/api/file/:name', function (req, res, next) {
+app.get('/api/file/:name', function(req, res, next) {
   var options = {
     root: path.join(__dirname, 'public'),
     dotfiles: 'deny',
@@ -278,9 +306,9 @@ app.get('/api/file/:name', function (req, res, next) {
     }
   }
   var fileName = req.params.name
-  res.sendFile(fileName, options, function (err) {
+  res.sendFile(fileName, options, function(err) {
     if (err)
-      next(err)
+      res.sendFile("user_avatar.png", options);
 
     console.log('Sent:', fileName)
   })
@@ -291,7 +319,7 @@ app.get('/api/image/:userID/:petID', async (req, res) => {
 });
 
 //add an image to for a user or pet
-app.post('/api/upload/:userID/:petID/:defaultpic', upload.single('image'), async function (req, res) {
+app.post('/api/upload/:userID/:petID/:defaultpic', upload.single('image'), async function(req, res) {
   const imagePath = path.join(__dirname, '/public');
   const fileUpload = new Resize(imagePath);
 
@@ -304,7 +332,7 @@ app.post('/api/upload/:userID/:petID/:defaultpic', upload.single('image'), async
   const filename = await fileUpload.save(req.file.buffer);
 
   dBHandler.addImage(req.params.userID, filename, req.params.defaultpic, req.params.petID,
-    function (err, result) {
+    function(err, result) {
 
       if (err)
         return res.status(200)
@@ -341,7 +369,7 @@ app.post('/api/likes', async (req, res) => {
 });
 
 //To send Page not found
-app.get('/**', function (req, res) {
+app.get('/**', function(req, res) {
   res.sendFile(path.resolve(__dirname, "public", "page404.html"));
 });
 
