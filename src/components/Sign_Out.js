@@ -11,15 +11,16 @@ class SignOut extends Component {
             removeUserSession();
             setTimeout(()=>{
             this.props.history.push('/sign_in');
+            window.location.reload();
             }, 1500);
         }
     }
 
     render(){
         return(
-            
+
             <div>
-                
+
                 <h2 class="center tc light-purple">Login Out.....</h2>
                 <h4 class="center tc light-purple">Bye Bye!</h4>
             </div>

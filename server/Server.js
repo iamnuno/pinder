@@ -53,8 +53,11 @@ conn.connect(function (err) {
 });
 
 //Verify the user's authentication
-app.get('/api/verifyToken', function (req, res) {
-  var token = req.body.token || req.query.token;
+app.post('/api/verifyToken', async (req, res)=> {
+  var token = req.body.token;
+  var userID = req.body.userId ;
+
+  userData = await dBHandler.getUser(userID);
 
   if (!token) {
     return res.status(400).json({
@@ -69,14 +72,14 @@ app.get('/api/verifyToken', function (req, res) {
       message: "Invalid token."
     });
 
-    if (user.id !== userData.id) {
-      return res.status(401).json({
-        error: true,
-        message: "Invalid user."
-      });
-    }
+    // if (user.id !== userData.id) {
+    //   return res.status(401).json({
+    //     error: true,
+    //     message: "Invalid user."
+    //   });
+    // }
 
-    return res.json({ userData: userData, token });
+    return res.json({ Data: userData[0].id, Token: token });
   });
 });
 
@@ -93,10 +96,10 @@ app.post('/api/login', async (req, res) => {
     if (data[0].cnt > 0) {
       userData = await dBHandler.getUserByEmail(email);
       var token = dBHandler.generateToken(userData);
-      res.json({ message: "Log In Successfully", status: true, Data: userData, Token: token });
+      res.json({ message: "Log In Successfully", status: true, Data: userData[0].id, Token: token });
     }
     else {
-      res.json({ message: "Check your email and password", status: false, Data: userData });
+      res.json({ message: "Check your email and password", status: false, Data: userData[0].id });
 
     }
 
@@ -109,7 +112,7 @@ app.get('/home', (req, res) => {
   res.send('Welcome ' + req.user.name);
 });
 
-//To send contact us page 
+//To send contact us page
 app.get('/contact_us', function (req, res) {
 
   res.sendFile(path.resolve(__dirname, "public", "contactUs.html"));
@@ -183,7 +186,7 @@ app.post('/api/createUser', async (req, res) => {
         res.json({
           message: "Account Created",
           status: true,
-          Data: userData,
+          Data: userData[0].id,
           Token: token
         });
       }

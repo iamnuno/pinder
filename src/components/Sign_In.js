@@ -50,6 +50,7 @@ class SignIn extends Component {
       this.setState({style: "green center tc"});
       setTimeout(()=>{
         this.props.history.push('/home/');
+        window.location.reload();
       }, 500);
     }
     else {
@@ -63,7 +64,7 @@ class SignIn extends Component {
 
     render() {
         return (
-         
+
           <div  className="sign">
             <div className="wrap">
                 <h2>Log In</h2>

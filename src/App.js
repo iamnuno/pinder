@@ -21,13 +21,16 @@ function App() {
   const [authLoading, setAuthLoading] = useState(true);
 
   useEffect(() => {
-   
-    const token = getToken();
-    if (!token) {
+    const data= {
+      token: getToken(),
+      userId: getUser()
+    }
+    if (!data.token) {
       return;
     }
-    fetch(`http://localhost:4412/api/verifyToken?token=${token}`, {
-      method: 'GET',
+    fetch('http://localhost:4412/api/verifyToken', {
+      method: 'POST',
+      body: JSON.stringify(data),
       headers: { 'Content-Type': 'application/json' }
     })
       .then(res => res.json())
