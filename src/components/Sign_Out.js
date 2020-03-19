@@ -21,7 +21,7 @@ class SignOut extends Component {
 
             <div>
 
-                <h2 class="center tc light-purple">Login Out.....</h2>
+                <h2 class="center tc light-purple">Logging Out.....</h2>
                 <h4 class="center tc light-purple">Bye Bye!</h4>
             </div>
         )
