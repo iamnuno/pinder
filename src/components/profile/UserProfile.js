@@ -222,7 +222,6 @@ class UserProfile extends Component {
         if (this.state.activeProfile === item.name)
           petID = item.id;
       });
-      alert(petID);
       fetch(`http://localhost:4412/api/upload/${this.state.user.id}/${petID}/1`, {
         method: 'POST',
         body: formData

@@ -73,6 +73,7 @@ class SignUp extends Component {
       this.setState({ style: "green center tc" });
       setTimeout(() => {
         this.props.history.push('/home/');
+        window.location.reload();
       }, 1000);
     }
     else {
