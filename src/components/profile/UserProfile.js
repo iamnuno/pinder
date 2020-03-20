@@ -13,7 +13,7 @@ import "tachyons-word-break";
 import 'swiper/css/swiper.css';
 import ReactLoading from "react-loading";
 import CommentContainer from './CommentContainer';
-import { getUser } from '../Common';
+import { getUser, removeUserSession } from '../Common';
 
 class UserProfile extends Component {
 
@@ -232,6 +232,17 @@ class UserProfile extends Component {
     }
   }
 
+  deleteAccount = () => {
+    fetch(`http://localhost:4412/api/dacc/${this.state.user.id}`, {
+      method: 'DELETE',
+    })
+      .catch(error => alert("Failed to delete!"))
+      .then(response => alert("Your account has been removed!"))
+    removeUserSession();
+    this.props.history.push("/sign_in");
+    window.location.reload();
+  }
+
   render() {
     let desc;
     let pic;
@@ -239,6 +250,14 @@ class UserProfile extends Component {
     let activePet;
     let decsStyle;
     let comment = null;
+    let removeAccount = null;
+    if (this.state.user)
+      removeAccount = (!this.state.edit || this.state.activeProfile != this.state.user.name) ? null
+        :
+        <div className="center pointer br3 pa3 mv4 bg-red white w-50 b tc" onClick={this.deleteAccount}>
+          Delete my account
+    </div>
+        ;
     let PetContainer = (this.state.showPetContainer) ? <NewPetContainer uid={this.state.user.id} container={this.NewPetContainerState} /> : null;
     let newImageIcon = (!this.state.edit) ? null
       :
@@ -255,12 +274,11 @@ class UserProfile extends Component {
         </div>
       </div>
 
-
     if (!this.state.loading) {
 
       if (this.state.activeProfile === this.state.user.name) {
         desc = "";
-        decsStyle={display:"none"};
+        decsStyle = { display: "none" };
         comment = null;
         pic = this.profileGallery(this.state.user.picture);
         grid = this.generateTable(this.state.userLabels, this.state.user);
@@ -268,7 +286,7 @@ class UserProfile extends Component {
         for (const [index, value] of this.state.pets.entries()) {
           if (this.state.activeProfile === value.name) {
             activePet = value;
-            decsStyle={display:"block"};
+            decsStyle = { display: "block" };
             if (value.comments.length != 0)
               comment = <CommentContainer {...this.props} pet={activePet} />;
             desc = value.description;
@@ -304,6 +322,7 @@ class UserProfile extends Component {
             <div className="center w-80 bg-black" style={{ height: "1px" }}></div>
 
             {grid}
+            {removeAccount}
           </div>
           {PetContainer}
           {comment}

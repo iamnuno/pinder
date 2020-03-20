@@ -51,10 +51,10 @@ function deletePet(petID, callback) {
 }
 
 // add a pet to db
-function addPet  (json,callback) {
+function addPet(json, callback) {
   connection.query(
     'INSERT INTO pets SET name = ?, birthday = ?, gender = ?, description = ?, type = ?, users_id = ?',
-    [json.name, json.birthday, json.gender, json.description, json.type, json.users_id],callback)
+    [json.name, json.birthday, json.gender, json.description, json.type, json.users_id], callback)
 }
 
 const maxId = async () => {
@@ -115,7 +115,7 @@ const getAllPets = async () => {
 
 function addImage(userID, fileName, defaultpic = 0, petID = 0, callback) {
   connection.query('INSERT INTO photos SET url = ?, defaultpic = ?, pets_id = ?, users_id = ?',
-   [fileName, defaultpic, (petID == 0) ? null : petID, userID], callback);
+    [fileName, defaultpic, (petID == 0) ? null : petID, userID], callback);
 }
 
 const getImages = async (userID, petID) => {
@@ -167,13 +167,13 @@ const getLikePetId = async (id) => {
 const makeLike = (body) => {
   return new Promise(function(resolve, reject) {
     connection.query('INSERT INTO likes (users_id, pets_id, comment) VALUES (?,?,?)',
-    [body.users_id, body.pets_id, body.comment],
-    (err, results) => {
-      if (err) {
-        return reject(err);
-      }
-      resolve(results);
-    });
+      [body.users_id, body.pets_id, body.comment],
+      (err, results) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(results);
+      });
   });
 }
 
@@ -187,43 +187,49 @@ const getImage = async (petID) => {
   });
 }
 
-function generateToken(user){
+function generateToken(user) {
 
-  if(!user) return null;
+  if (!user) return null;
 
-  var u ={
-      userID: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      birthday: user.birthday
+  var u = {
+    userID: user.id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+    birthday: user.birthday
   };
 
   return token = jwt.sign(u, process.env.JWT_SECRET, {
-      expiresIn: 60 * 60 * 24
+    expiresIn: 60 * 60 * 24
   });
 }
 
-const getUserByEmail = async(email)=>{
-  return new Promise((resolve, reject)=>{
-      connection.query('SELECT id, firstName, lastName, email, birthday FROM users WHERE email=?',
-  [email], (err, results) =>{
-      if(err){
+const getUserByEmail = async (email) => {
+  return new Promise((resolve, reject) => {
+    connection.query('SELECT id, firstName, lastName, email, birthday FROM users WHERE email=?',
+      [email], (err, results) => {
+        if (err) {
           return reject(err);
-      }
-      resolve(results);
+        }
+        resolve(results);
+      });
   });
-  });
+}
 
+function removeUser(uid, callback) {
+  connection.query('DELETE FROM users WHERE id = ?',
+    [uid], callback);
 }
 
 module.exports = {
   getUsers: getUsers,
   addUser: addUser,
+  removeUser: removeUser,
   emailExists: emailExists,
   updateUser: updateUser,
   updatePet: updatePet,
   getUser: getUser,
+  removeUser:removeUser,
   getUserByEmail: getUserByEmail,
   generateToken: generateToken,
   getAllPets: getAllPets,
@@ -238,7 +244,5 @@ module.exports = {
   makeLike: makeLike,
   getLikePetId: getLikePetId,
   getAllLikes: getAllLikes,
-  getAllPetsImages: getAllPetsImages,//
-
-
+  getAllPetsImages: getAllPetsImages,
 }

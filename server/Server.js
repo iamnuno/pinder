@@ -155,7 +155,7 @@ app.get('/api/user/:id', async (req, res) => {
     userPic.push(item.url);
   });
   if (userPic.length == 0)
-  userPic.push("user_avatar.png");
+    userPic.push("user_avatar.png");
 
   json.picture = userPic;
 
@@ -168,7 +168,7 @@ app.get('/api/user/:id', async (req, res) => {
       petpic.push(item.url);
     });
     if (petpic.length == 0)
-    petpic.push("user_avatar.png");
+      petpic.push("user_avatar.png");
 
     (await dBHandler.getComments(pets[i].id)).forEach((item, i) => {
       comments.push(item);
@@ -366,6 +366,15 @@ app.get('/api/likes/:petId', async (req, res) => {
 //make a like
 app.post('/api/likes', async (req, res) => {
   res.json(await dBHandler.makeLike(req.body));
+});
+
+//To delete a user
+app.delete('/api/dacc/:id', function(req, res) {
+  dBHandler.removeUser(req.params.id, function(err, response) {
+    return res.json((err) ? {
+      error: "failed to remove user!"
+    } : "user removed");
+  });
 });
 
 //To send Page not found

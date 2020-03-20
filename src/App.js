@@ -21,7 +21,7 @@ function App() {
   const [authLoading, setAuthLoading] = useState(true);
 
   useEffect(() => {
-    const data= {
+    const data = {
       token: getToken(),
       userId: getUser()
     }
@@ -49,17 +49,17 @@ function App() {
   return (
     <Router>
       <div>
-        <Header  />
+        <Header />
         <Switch>
-        <Route exact path="/"  component={SignIn}/>
+          <Route exact path="/" component={SignIn} />
           <ProtectedRoute path="/profile" component={UserProfile} />
-          <ProtectedRoute exact path="/home" component={Home}/>
+          <ProtectedRoute exact path="/home" component={Home} />
           <Route exact path="/about" component={About} />
           <Route exact path="/contact-us" component={Contact} />
           <Route exact path="/sign_in" component={SignIn} />
           <Route exact path="/sign_up" component={SignUp} />
           <ProtectedRoute exact path="/sign_out" component={SignOut} />
-          <Route path = "/**" component={pageNotFound}/>
+          <Route path="/**" component={pageNotFound} />
         </Switch>
         <Footer />
       </div>
