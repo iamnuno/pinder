@@ -35,7 +35,7 @@ class UserProfile extends Component {
         client.getAccount(this.state.id)
           .then(res =>
             this.setState({
-              user: new user(res["0"].firstName, res["0"].lastName, "decs", res["0"].email, res["0"].birthday, res["0"].password, res["picture"], res["0"].id),
+              user: new user(res["0"].firstName, res["0"].lastName, "", res["0"].email, res["0"].birthday, res["0"].password, res["picture"], res["0"].id),
               pets: res["pets"],
               activeProfile: res["0"].firstName + " " + res["0"].lastName,
               loading: false
@@ -238,6 +238,7 @@ class UserProfile extends Component {
     let pic;
     var grid;
     let activePet;
+    let decsStyle;
     let comment = null;
     let PetContainer = (this.state.showPetContainer) ? <NewPetContainer uid={this.state.user.id} container={this.NewPetContainerState} /> : null;
     let newImageIcon = (!this.state.edit) ? null
@@ -259,7 +260,8 @@ class UserProfile extends Component {
     if (!this.state.loading) {
 
       if (this.state.activeProfile === this.state.user.name) {
-        desc = this.state.user.description;
+        desc = "";
+        decsStyle={display:"none"};
         comment = null;
         pic = this.profileGallery(this.state.user.picture);
         grid = this.generateTable(this.state.userLabels, this.state.user);
@@ -267,6 +269,7 @@ class UserProfile extends Component {
         for (const [index, value] of this.state.pets.entries()) {
           if (this.state.activeProfile === value.name) {
             activePet = value;
+            decsStyle={display:"block"};
             if (value.comments.length != 0)
               comment = <CommentContainer {...this.props} pet={activePet} />;
             desc = value.description;
@@ -298,7 +301,7 @@ class UserProfile extends Component {
             {pic}
             {newImageIcon}
 
-            <div ref={(input) => { this.desc = input }} className="center mt1-ns mv2-ns bg-white pa2 br4 word-wrap tc" style={{ maxWidth: "70%", textAlign: "center" }} contentEditable={this.state.edit} suppressContentEditableWarning={true}>{desc}</div>
+            <div ref={(input) => { this.desc = input }} className="center mt1-ns mv2-ns bg-white pa2 br4 word-wrap tc w-70" style={decsStyle} contentEditable={this.state.edit} suppressContentEditableWarning={true}>{desc}</div>
             <div className="center w-80 bg-black" style={{ height: "1px" }}></div>
 
             {grid}
